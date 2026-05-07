@@ -4,7 +4,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { TopBar } from '@/components/layout/topbar';
-import { Plus, Search, Filter, MoreHorizontal, Edit, Trash2, Eye, MapPin, Calendar, Users, DollarSign, GraduationCap } from 'lucide-react';
+import { Plus, Search, Filter, MoreHorizontal, Edit, Trash2, Eye, MapPin, Calendar, Users, DollarSign, GraduationCap, X } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -20,7 +20,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { createClient } from '@/lib/supabase/client';
 import type { Program } from '@/types/database';
 import { toast } from 'sonner';
-import { useForm } from 'react-hook-form';
+import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import Link from 'next/link';
@@ -35,6 +35,13 @@ const programSchema = z.object({
   max_participants: z.coerce.number().min(1),
   program_fee: z.coerce.number().min(0),
   status: z.string().default('upcoming'),
+  participants: z.array(
+    z.object({
+      full_name: z.string().min(2, "Required"),
+      email: z.string().optional(),
+      phone: z.string().optional(),
+    })
+  ).optional().default([]),
 });
 type ProgramForm = z.infer<typeof programSchema>;
 
@@ -55,9 +62,14 @@ export default function ProgramsPage() {
   const [creating, setCreating] = useState(false);
   const [counts, setCounts] = useState<Record<string, number>>({});
 
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<ProgramForm>({
+  const { register, handleSubmit, reset, control, formState: { errors } } = useForm<ProgramForm>({
     resolver: zodResolver(programSchema),
-    defaultValues: { max_participants: 50, program_fee: 0, status: 'upcoming' },
+    defaultValues: { max_participants: 50, program_fee: 0, status: 'upcoming', participants: [] },
+  });
+
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "participants"
   });
 
   const fetchData = useCallback(async () => {
@@ -86,10 +98,38 @@ export default function ProgramsPage() {
     try {
       const supabase = createClient();
       const { data: { user } } = await supabase.auth.getUser();
-      await supabase.from('programs').insert({ ...data, created_by: user?.id });
-      toast.success('Program created!');
+      
+      const { participants, ...programData } = data;
+      
+      // 1. Create the Program
+      const { data: newProgram, error: progError } = await supabase
+        .from('programs')
+        .insert({ ...programData, created_by: user?.id })
+        .select()
+        .single();
+        
+      if (progError) throw progError;
+      
+      // 2. Add the initial participants (if any)
+      if (participants && participants.length > 0) {
+        const participantsToInsert = participants.map(p => ({
+          ...p,
+          program_id: newProgram.id,
+          attendance_status: 'absent',
+          payment_status: 'pending',
+          amount_paid: 0,
+          pending_amount: programData.program_fee
+        }));
+        
+        const { error: partError } = await supabase.from('participants').insert(participantsToInsert);
+        if (partError) throw partError;
+      }
+      
+      toast.success('Program created with participants!');
       setDialogOpen(false); reset(); fetchData();
-    } catch { toast.error('Failed to create'); }
+    } catch (e: any) { 
+      toast.error('Failed to create: ' + (e.message || 'Unknown error')); 
+    }
     finally { setCreating(false); }
   };
 
@@ -125,26 +165,54 @@ export default function ProgramsPage() {
             <DialogTrigger asChild>
               <Button className="gradient-primary text-white gap-2"><Plus className="w-4 h-4" />Create Program</Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-lg">
-              <DialogHeader><DialogTitle>Create Program</DialogTitle><DialogDescription>Add a new workshop.</DialogDescription></DialogHeader>
+            <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader><DialogTitle>Create Program</DialogTitle><DialogDescription>Add a new workshop and its participants.</DialogDescription></DialogHeader>
               <form onSubmit={handleSubmit(onCreate)} className="space-y-4 mt-4">
-                <div className="space-y-2"><Label>Name</Label><Input {...register('program_name')} />{errors.program_name && <p className="text-xs text-destructive">Required</p>}</div>
-                <div className="space-y-2"><Label>Description</Label><Textarea rows={3} {...register('description')} /></div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2 md:col-span-2"><Label>Name</Label><Input {...register('program_name')} />{errors.program_name && <p className="text-xs text-destructive">Required</p>}</div>
+                  <div className="space-y-2 md:col-span-2"><Label>Description</Label><Textarea rows={2} {...register('description')} /></div>
                   <div className="space-y-2"><Label>Venue</Label><Input {...register('venue')} /></div>
                   <div className="space-y-2"><Label>Instructor</Label><Input {...register('instructor_name')} /></div>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2"><Label>Start</Label><Input type="date" {...register('start_date')} /></div>
                   <div className="space-y-2"><Label>End</Label><Input type="date" {...register('end_date')} /></div>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2"><Label>Max Participants</Label><Input type="number" {...register('max_participants')} /></div>
                   <div className="space-y-2"><Label>Fee (₹)</Label><Input type="number" step="0.01" {...register('program_fee')} /></div>
                 </div>
-                <div className="flex gap-3 justify-end pt-2">
+
+                <div className="pt-4 border-t mt-6">
+                  <div className="flex items-center justify-between mb-3">
+                    <Label className="text-base font-semibold">Initial Participants (Optional)</Label>
+                    <Button type="button" variant="outline" size="sm" onClick={() => append({ full_name: '', email: '', phone: '' })}>
+                      <Plus className="w-4 h-4 mr-1" /> Add Participant
+                    </Button>
+                  </div>
+                  {fields.length === 0 && (
+                    <p className="text-sm text-muted-foreground italic mb-2">No participants added yet. You can add them later.</p>
+                  )}
+                  <div className="space-y-3">
+                    {fields.map((field, index) => (
+                      <div key={field.id} className="flex gap-2 items-start bg-muted/30 p-2 rounded-md">
+                        <div className="flex-1 space-y-1">
+                           <Input placeholder="Full Name *" {...register(`participants.${index}.full_name` as const)} className="h-9 text-sm" />
+                           {errors.participants?.[index]?.full_name && <p className="text-xs text-destructive">Name is required</p>}
+                        </div>
+                        <div className="flex-1 space-y-1">
+                           <Input placeholder="Email" {...register(`participants.${index}.email` as const)} className="h-9 text-sm" />
+                        </div>
+                        <div className="flex-1 space-y-1">
+                           <Input placeholder="Phone" {...register(`participants.${index}.phone` as const)} className="h-9 text-sm" />
+                        </div>
+                        <Button type="button" variant="ghost" size="icon" className="h-9 w-9 text-muted-foreground hover:text-destructive shrink-0" onClick={() => remove(index)}>
+                          <X className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="flex gap-3 justify-end pt-4 border-t mt-4">
                   <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>Cancel</Button>
-                  <Button type="submit" className="gradient-primary text-white" disabled={creating}>{creating ? 'Creating...' : 'Create'}</Button>
+                  <Button type="submit" className="gradient-primary text-white px-6" disabled={creating}>{creating ? 'Creating...' : 'Create Program'}</Button>
                 </div>
               </form>
             </DialogContent>
