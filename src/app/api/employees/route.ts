@@ -81,11 +81,12 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: empError.message }, { status: 400 });
     }
 
-    // Assign programs if provided
-    if (program_ids && Array.isArray(program_ids) && program_ids.length > 0) {
-      const assignments = program_ids.map((progId: string) => ({
+    // Automatically assign ALL active programs to this new employee
+    const { data: allPrograms } = await serviceClient.from('programs').select('id').in('status', ['upcoming', 'active']);
+    if (allPrograms && allPrograms.length > 0) {
+      const assignments = allPrograms.map((prog: { id: string }) => ({
         employee_id: employee.id,
-        program_id: progId
+        program_id: prog.id
       }));
       await serviceClient.from('employee_programs').insert(assignments);
     }

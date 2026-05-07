@@ -109,6 +109,16 @@ export default function ProgramsPage() {
         .single();
         
       if (progError) throw progError;
+
+      // 1.5 Automatically assign ALL employees to this new program
+      const { data: allEmployees } = await supabase.from('employees').select('id');
+      if (allEmployees && allEmployees.length > 0) {
+        const assignments = allEmployees.map(emp => ({
+          employee_id: emp.id,
+          program_id: newProgram.id
+        }));
+        await supabase.from('employee_programs').insert(assignments);
+      }
       
       // 2. Add the initial participants (if any)
       if (participants && participants.length > 0) {
