@@ -131,7 +131,7 @@ export default function ProgramDetailPage({ params }: { params: Promise<{ id: st
               {participants.length === 0 ? (
                 <div className="py-12 text-center"><UserCheck className="w-10 h-10 text-muted-foreground/30 mx-auto mb-2" /><p className="text-sm text-muted-foreground">No participants yet</p></div>
               ) : (
-                <Table><TableHeader><TableRow><TableHead>Name</TableHead><TableHead>Email</TableHead><TableHead>Phone</TableHead><TableHead>Attendance</TableHead><TableHead>Payment</TableHead><TableHead>Paid</TableHead><TableHead>Pending</TableHead></TableRow></TableHeader>
+                <Table><TableHeader><TableRow><TableHead>Name</TableHead><TableHead>Email</TableHead><TableHead>Phone</TableHead><TableHead>Attendance</TableHead><TableHead>Payment</TableHead><TableHead>Paid</TableHead><TableHead>Pending</TableHead><TableHead className="w-24"></TableHead></TableRow></TableHeader>
                   <TableBody>{participants.map(p => (
                     <TableRow key={p.id} className="table-row-hover">
                       <TableCell className="font-medium">{p.full_name}</TableCell>
@@ -151,6 +151,19 @@ export default function ProgramDetailPage({ params }: { params: Promise<{ id: st
                       <TableCell><Badge variant="outline" className={p.payment_status === 'paid' ? 'bg-emerald-500/10 text-emerald-600' : p.payment_status === 'partial' ? 'bg-amber-500/10 text-amber-600' : 'bg-red-500/10 text-red-600'}>{p.payment_status}</Badge></TableCell>
                       <TableCell className="font-medium">₹{Number(p.amount_paid).toLocaleString()}</TableCell>
                       <TableCell className="text-destructive">₹{Number(p.pending_amount).toLocaleString()}</TableCell>
+                      <TableCell>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="h-8 gap-1 px-2 text-xs" 
+                          onClick={() => {
+                            setPayForm({ ...payForm, participant_id: p.id, amount: p.pending_amount > 0 ? p.pending_amount.toString() : '' });
+                            setAddPaymentOpen(true);
+                          }}
+                        >
+                          <DollarSign className="w-3 h-3" /> Pay
+                        </Button>
+                      </TableCell>
                     </TableRow>
                   ))}</TableBody>
                 </Table>

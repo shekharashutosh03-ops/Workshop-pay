@@ -87,7 +87,7 @@ export default function EmployeeProgramDetailPage({ params }: { params: Promise<
           <TabsContent value="participants" className="space-y-4">
             <Button className="gradient-primary text-white gap-2" onClick={() => setAddOpen(true)}><Plus className="w-4 h-4" />Add</Button>
             <Card className="border-0 shadow-sm"><CardContent className="p-0">
-              <Table><TableHeader><TableRow><TableHead>Name</TableHead><TableHead>Email</TableHead><TableHead>Attendance</TableHead><TableHead>Payment</TableHead><TableHead>Paid</TableHead><TableHead>Pending</TableHead></TableRow></TableHeader>
+              <Table><TableHeader><TableRow><TableHead>Name</TableHead><TableHead>Email</TableHead><TableHead>Attendance</TableHead><TableHead>Payment</TableHead><TableHead>Paid</TableHead><TableHead>Pending</TableHead><TableHead className="w-24"></TableHead></TableRow></TableHeader>
                 <TableBody>{participants.map(p => (
                   <TableRow key={p.id} className="table-row-hover">
                     <TableCell className="font-medium">{p.full_name}</TableCell>
@@ -101,6 +101,19 @@ export default function EmployeeProgramDetailPage({ params }: { params: Promise<
                     <TableCell><Badge variant="outline" className={p.payment_status === 'paid' ? 'bg-emerald-500/10 text-emerald-600' : 'bg-red-500/10 text-red-600'}>{p.payment_status}</Badge></TableCell>
                     <TableCell>₹{Number(p.amount_paid).toLocaleString()}</TableCell>
                     <TableCell className="text-destructive">₹{Number(p.pending_amount).toLocaleString()}</TableCell>
+                    <TableCell>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="h-8 gap-1 px-2 text-xs" 
+                        onClick={() => {
+                          setPayForm({ ...payForm, participant_id: p.id, amount: p.pending_amount > 0 ? p.pending_amount.toString() : '' });
+                          setPayOpen(true);
+                        }}
+                      >
+                        <DollarSign className="w-3 h-3" /> Pay
+                      </Button>
+                    </TableCell>
                   </TableRow>
                 ))}</TableBody>
               </Table>
