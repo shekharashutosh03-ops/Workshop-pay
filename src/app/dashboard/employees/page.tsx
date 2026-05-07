@@ -65,6 +65,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { createClient } from '@/lib/supabase/client';
 import type { Employee } from '@/types/database';
@@ -80,6 +81,7 @@ const createEmployeeSchema = z.object({
   phone: z.string().optional(),
   designation: z.string().min(1, 'Designation is required'),
   joining_date: z.string().optional(),
+  program_ids: z.array(z.string()).optional(),
 });
 
 type CreateEmployeeForm = z.infer<typeof createEmployeeSchema>;
@@ -105,10 +107,15 @@ export default function EmployeesPage() {
     register,
     handleSubmit,
     reset,
+    getValues,
+    setValue,
     formState: { errors },
   } = useForm<CreateEmployeeForm>({
     resolver: zodResolver(createEmployeeSchema),
+    defaultValues: { program_ids: [] }
   });
+
+  const [availablePrograms, setAvailablePrograms] = useState<{ id: string, program_name: string }[]>([]);
 
   const fetchEmployees = useCallback(async () => {
     try {
@@ -120,6 +127,10 @@ export default function EmployeesPage() {
 
       if (error) throw error;
       setEmployees((data || []) as unknown as Employee[]);
+      
+      // Fetch programs for assignment
+      const { data: progData } = await supabase.from('programs').select('id, program_name').in('status', ['upcoming', 'active']).order('created_at', { ascending: false });
+      setAvailablePrograms(progData || []);
     } catch (error) {
       console.error('Error fetching employees:', error);
       toast.error('Failed to load employees');
@@ -277,7 +288,38 @@ export default function EmployeesPage() {
                   <Label htmlFor="joining_date">Joining Date</Label>
                   <Input id="joining_date" type="date" {...register('joining_date')} />
                 </div>
-                <div className="flex gap-3 justify-end pt-2">
+
+                {/* Programs Assignment Section */}
+                <div className="pt-4 border-t mt-4">
+                  <Label className="text-base font-semibold block mb-3">Assign Programs (Optional)</Label>
+                  <div className="space-y-2 max-h-40 overflow-y-auto p-1">
+                    {availablePrograms.length === 0 ? (
+                      <p className="text-sm text-muted-foreground italic">No active programs available.</p>
+                    ) : (
+                      availablePrograms.map((program) => (
+                        <div key={program.id} className="flex items-center space-x-2">
+                          <Checkbox
+                            id={`program-${program.id}`}
+                            value={program.id}
+                            onCheckedChange={(checked) => {
+                              const currentIds = getValues('program_ids') || [];
+                              if (checked) {
+                                setValue('program_ids', [...currentIds, program.id]);
+                              } else {
+                                setValue('program_ids', currentIds.filter(id => id !== program.id));
+                              }
+                            }}
+                          />
+                          <Label htmlFor={`program-${program.id}`} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer">
+                            {program.program_name}
+                          </Label>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex gap-3 justify-end pt-4 border-t mt-4">
                   <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>
                     Cancel
                   </Button>

@@ -23,7 +23,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { full_name, email, password, phone, designation, joining_date } = body;
+    const { full_name, email, password, phone, designation, joining_date, program_ids } = body;
 
     // Use service role to create auth user
     const serviceClient = await createServiceRoleClient();
@@ -79,6 +79,15 @@ export async function POST(request: Request) {
 
     if (empError) {
       return NextResponse.json({ error: empError.message }, { status: 400 });
+    }
+
+    // Assign programs if provided
+    if (program_ids && Array.isArray(program_ids) && program_ids.length > 0) {
+      const assignments = program_ids.map((progId: string) => ({
+        employee_id: employee.id,
+        program_id: progId
+      }));
+      await serviceClient.from('employee_programs').insert(assignments);
     }
 
     // Log activity
