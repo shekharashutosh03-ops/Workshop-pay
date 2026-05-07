@@ -55,6 +55,7 @@ export function useAuth() {
   const signOut = async () => {
     await supabase.auth.signOut();
     setUser(null);
+    window.location.href = '/login';
   };
 
   const forgotPassword = async (email: string) => {
