@@ -53,9 +53,17 @@ export default function ProgramDetailPage({ params }: { params: Promise<{ id: st
   const addParticipant = async () => {
     if (!formData.full_name) return;
     const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
     await supabase.from('participants').insert({
       ...formData, program_id: id,
       pending_amount: program?.program_fee || 0,
+    });
+    // Log activity
+    await supabase.from('activity_logs').insert({
+      user_id: user?.id,
+      action: `Added participant "${formData.full_name}" to program "${program?.program_name}"`,
+      module: 'participants',
+      metadata: { participant_name: formData.full_name, program_id: id, program_name: program?.program_name },
     });
     toast.success('Participant added');
     setAddParticipantOpen(false);
@@ -88,6 +96,13 @@ export default function ProgramDetailPage({ params }: { params: Promise<{ id: st
         payment_status: 'paid',
         transaction_id: payForm.transaction_id || null,
         created_by: user?.id,
+      });
+      // Log activity
+      await supabase.from('activity_logs').insert({
+        user_id: user?.id,
+        action: `Recorded payment of ₹${payForm.amount} (${payForm.payment_mode}) for "${selectedParticipant.full_name}" in program "${program?.program_name}"`,
+        module: 'payments',
+        metadata: { participant_name: selectedParticipant.full_name, amount: payForm.amount, mode: payForm.payment_mode, program_name: program?.program_name },
       });
       toast.success('Payment recorded!');
       setPayDialogOpen(false);

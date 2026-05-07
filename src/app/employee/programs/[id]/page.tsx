@@ -53,7 +53,15 @@ export default function EmployeeProgramDetailPage({ params }: { params: Promise<
   const addParticipant = async () => {
     if (!form.full_name) return;
     const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
     await supabase.from('participants').insert({ ...form, program_id: id, pending_amount: program?.program_fee || 0 });
+    // Log activity
+    await supabase.from('activity_logs').insert({
+      user_id: user?.id,
+      action: `Added participant "${form.full_name}" to program "${program?.program_name}"`,
+      module: 'participants',
+      metadata: { participant_name: form.full_name, program_name: program?.program_name },
+    });
     toast.success('Participant added');
     setAddOpen(false);
     setForm({ full_name: '', email: '', phone: '' });
@@ -85,6 +93,13 @@ export default function EmployeeProgramDetailPage({ params }: { params: Promise<
         payment_status: 'paid',
         transaction_id: payForm.transaction_id || null,
         created_by: user?.id,
+      });
+      // Log activity
+      await supabase.from('activity_logs').insert({
+        user_id: user?.id,
+        action: `Recorded payment of ₹${payForm.amount} (${payForm.payment_mode}) for "${selectedParticipant.full_name}" in program "${program?.program_name}"`,
+        module: 'payments',
+        metadata: { participant_name: selectedParticipant.full_name, amount: payForm.amount, mode: payForm.payment_mode, program_name: program?.program_name },
       });
       toast.success('Payment recorded!');
       setPayOpen(false);
