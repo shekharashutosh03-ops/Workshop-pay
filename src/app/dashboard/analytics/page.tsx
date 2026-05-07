@@ -5,51 +5,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, BarChart, Bar, Legend, LineChart, Line } from 'recharts';
 
-const revenueData = [
-  { month: 'Jan', revenue: 12400, target: 15000 },
-  { month: 'Feb', revenue: 18200, target: 16000 },
-  { month: 'Mar', revenue: 15800, target: 17000 },
-  { month: 'Apr', revenue: 22400, target: 18000 },
-  { month: 'May', revenue: 28600, target: 20000 },
-  { month: 'Jun', revenue: 24200, target: 22000 },
-  { month: 'Jul', revenue: 31200, target: 24000 },
-  { month: 'Aug', revenue: 27800, target: 26000 },
-];
-
-const participantGrowth = [
-  { month: 'Jan', newParticipants: 45, returning: 12 },
-  { month: 'Feb', newParticipants: 62, returning: 18 },
-  { month: 'Mar', newParticipants: 54, returning: 24 },
-  { month: 'Apr', newParticipants: 78, returning: 30 },
-  { month: 'May', newParticipants: 92, returning: 35 },
-  { month: 'Jun', newParticipants: 85, returning: 42 },
-  { month: 'Jul', newParticipants: 110, returning: 48 },
-  { month: 'Aug', newParticipants: 98, returning: 55 },
-];
-
-const programSuccess = [
-  { name: 'React Workshop', completion: 95, satisfaction: 4.8, revenue: 45000 },
-  { name: 'Node.js Bootcamp', completion: 88, satisfaction: 4.5, revenue: 38000 },
-  { name: 'Python ML Course', completion: 92, satisfaction: 4.7, revenue: 52000 },
-  { name: 'UI/UX Design', completion: 85, satisfaction: 4.3, revenue: 28000 },
-  { name: 'Cloud DevOps', completion: 90, satisfaction: 4.6, revenue: 42000 },
-];
-
-const paymentModes = [
-  { name: 'UPI', value: 45, color: '#7c3aed' },
-  { name: 'Card', value: 25, color: '#06b6d4' },
-  { name: 'Bank Transfer', value: 18, color: '#10b981' },
-  { name: 'Cash', value: 12, color: '#f59e0b' },
-];
-
-const collectionTrends = [
-  { month: 'Jan', collected: 42000, pending: 8000 },
-  { month: 'Feb', collected: 55000, pending: 12000 },
-  { month: 'Mar', collected: 48000, pending: 9000 },
-  { month: 'Apr', collected: 68000, pending: 15000 },
-  { month: 'May', collected: 82000, pending: 11000 },
-  { month: 'Jun', collected: 75000, pending: 8000 },
-];
+const revenueData: any[] = [];
+const participantGrowth: any[] = [];
+const programSuccess: any[] = [];
+const paymentModes: any[] = [];
+const collectionTrends: any[] = [];
 
 export default function AnalyticsPage() {
   return (

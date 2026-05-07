@@ -52,31 +52,10 @@ const itemVariants = {
 
 const CHART_COLORS = ['#7c3aed', '#06b6d4', '#f59e0b', '#ef4444', '#10b981', '#8b5cf6'];
 
-// Mock data for charts when DB is empty
-const mockRevenueData = [
-  { month: 'Jan', revenue: 12400, target: 15000 },
-  { month: 'Feb', revenue: 18200, target: 16000 },
-  { month: 'Mar', revenue: 15800, target: 17000 },
-  { month: 'Apr', revenue: 22400, target: 18000 },
-  { month: 'May', revenue: 28600, target: 20000 },
-  { month: 'Jun', revenue: 24200, target: 22000 },
-];
-
-const mockProgramDistribution = [
-  { name: 'Active', value: 8, color: '#7c3aed' },
-  { name: 'Upcoming', value: 5, color: '#06b6d4' },
-  { name: 'Completed', value: 12, color: '#10b981' },
-  { name: 'Cancelled', value: 2, color: '#ef4444' },
-];
-
-const mockPaymentTrends = [
-  { month: 'Jan', paid: 8400, pending: 3200, partial: 1200 },
-  { month: 'Feb', paid: 12300, pending: 4100, partial: 1800 },
-  { month: 'Mar', paid: 10200, pending: 3600, partial: 2000 },
-  { month: 'Apr', paid: 16100, pending: 4200, partial: 2100 },
-  { month: 'May', paid: 21400, pending: 5000, partial: 2200 },
-  { month: 'Jun', paid: 18600, pending: 3800, partial: 1800 },
-];
+// Empty arrays for when DB is empty
+const mockRevenueData: any[] = [];
+const mockProgramDistribution: any[] = [];
+const mockPaymentTrends: any[] = [];
 
 export default function AdminDashboardPage() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
