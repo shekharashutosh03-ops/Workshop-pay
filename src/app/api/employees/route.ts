@@ -42,12 +42,19 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: authError.message }, { status: 400 });
     }
 
-    // Update profile with phone
-    if (phone) {
-      await serviceClient
-        .from('profiles')
-        .update({ phone })
-        .eq('id', authData.user.id);
+    // Ensure profile exists (upsert handles both cases: if trigger worked or if trigger is missing)
+    const { error: profileError } = await serviceClient
+      .from('profiles')
+      .upsert({
+        id: authData.user.id,
+        full_name,
+        email,
+        role: 'employee',
+        phone: phone || null,
+      });
+
+    if (profileError) {
+      return NextResponse.json({ error: 'Failed to create profile: ' + profileError.message }, { status: 400 });
     }
 
     // Generate employee code
