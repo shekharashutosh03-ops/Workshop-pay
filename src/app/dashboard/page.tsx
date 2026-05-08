@@ -195,7 +195,7 @@ export default function AdminDashboardPage() {
                       <XAxis dataKey="name" tick={{ fontSize: 11 }} />
                       <YAxis tick={{ fontSize: 11 }} tickFormatter={v => `₹${v}`} />
                       <Tooltip
-                        formatter={(val: any, name: string) => [formatCurrency(val), name === 'collected' ? 'Collected' : 'Pending']}
+                        formatter={(val: any, name: any) => [formatCurrency(val), name === 'collected' ? 'Collected' : 'Pending']}
                         labelFormatter={(label, payload) => payload?.[0]?.payload?.fullName || label}
                         contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}
                       />
