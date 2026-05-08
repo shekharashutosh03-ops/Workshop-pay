@@ -61,8 +61,8 @@ export default function ForgotPasswordPage() {
         transition={{ duration: 0.6 }}
         className="w-full max-w-md"
       >
-        <div className="flex items-center justify-center w-16 h-16 rounded-2xl gradient-primary glow-primary mb-8 mx-auto">
-          <Sparkles className="w-8 h-8 text-white" />
+        <div className="flex items-center justify-center w-20 h-20 rounded-2xl bg-white mb-8 mx-auto shadow-xl overflow-hidden p-2">
+          <img src="/logo.png" alt="Sajan Shah Logo" className="w-full h-full object-contain" />
         </div>
 
         {sent ? (
@@ -98,7 +98,7 @@ export default function ForgotPasswordPage() {
                   <Input
                     id="email"
                     type="email"
-                    placeholder="admin@workshopflow.com"
+                    placeholder="admin@sajanshah.com"
                     className="pl-10 h-11 bg-muted/50 border-muted"
                     {...register('email')}
                   />

@@ -57,12 +57,12 @@ export default function LoginPage() {
         <motion.div className="absolute bottom-20 right-20 w-96 h-96 rounded-full bg-white/5 blur-3xl" animate={{ x: [0, -40, 0], y: [0, -50, 0] }} transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }} />
         <div className="relative z-10 flex flex-col items-center justify-center w-full text-white p-12">
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} className="text-center">
-            <div className="flex items-center justify-center w-20 h-20 rounded-2xl bg-white/20 backdrop-blur-sm mb-8 mx-auto ring-1 ring-white/30">
-              <Sparkles className="w-10 h-10" />
+            <div className="flex items-center justify-center w-24 h-24 rounded-2xl bg-white mb-8 mx-auto shadow-xl overflow-hidden p-2">
+              <img src="/logo.png" alt="Sajan Shah Logo" className="w-full h-full object-contain" />
             </div>
             <h1 className="text-5xl font-bold mb-4 tracking-tight">
-              WorkshopFlow
-              <span className="block text-2xl font-light mt-1 opacity-80">Pro Platform</span>
+              Sajan Shah
+              <span className="block text-2xl font-light mt-1 opacity-80">Payment System</span>
             </h1>
             <p className="text-lg text-white/70 max-w-md mx-auto leading-relaxed">
               Enterprise-grade workshop management. Streamline programs, empower teams, track every detail.
@@ -85,12 +85,12 @@ export default function LoginPage() {
 
           {/* Mobile logo */}
           <div className="lg:hidden flex items-center gap-3 mb-8">
-            <div className="flex items-center justify-center w-12 h-12 rounded-xl gradient-primary">
-              <Sparkles className="w-6 h-6 text-white" />
+            <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-white overflow-hidden p-1 shadow-md">
+              <img src="/logo.png" alt="Sajan Shah Logo" className="w-full h-full object-contain" />
             </div>
             <div>
-              <h1 className="text-xl font-bold">WorkshopFlow Pro</h1>
-              <p className="text-xs text-muted-foreground">Management Platform</p>
+              <h1 className="text-xl font-bold">Sajan Shah</h1>
+              <p className="text-xs text-muted-foreground">Payment System</p>
             </div>
           </div>
 
@@ -109,7 +109,7 @@ export default function LoginPage() {
                 <Label htmlFor="login-email">Email Address</Label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                  <Input id="login-email" type="email" placeholder="admin@workshopflow.com" className="pl-10 h-11 bg-muted/50 border-muted" {...loginForm.register('email')} />
+                  <Input id="login-email" type="email" placeholder="admin@sajanshah.com" className="pl-10 h-11 bg-muted/50 border-muted" {...loginForm.register('email')} />
                 </div>
                 {loginForm.formState.errors.email && <p className="text-xs text-destructive">{loginForm.formState.errors.email.message}</p>}
               </div>

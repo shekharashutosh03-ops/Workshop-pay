@@ -10,7 +10,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "WorkshopFlow Pro — Workshop & Program Management",
+  title: "Sajan Shah — Workshop Payment System",
   description: "Enterprise-grade workshop management platform for organizing programs, managing employees, tracking payments, and monitoring analytics.",
   keywords: ["workshop", "management", "SaaS", "programs", "payments", "analytics"],
 };

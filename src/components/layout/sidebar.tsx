@@ -65,8 +65,8 @@ export function Sidebar({ variant = 'admin' }: SidebarProps) {
       >
         {/* Logo */}
         <div className="flex items-center gap-3 px-5 h-16 shrink-0">
-          <div className="flex items-center justify-center w-10 h-10 rounded-xl gradient-primary glow-primary">
-            <Sparkles className="w-5 h-5 text-white" />
+          <div className="flex items-center justify-center w-10 h-10 rounded-xl overflow-hidden shrink-0 bg-white">
+            <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" />
           </div>
           <AnimatePresence>
             {sidebarOpen && (
@@ -76,11 +76,11 @@ export function Sidebar({ variant = 'admin' }: SidebarProps) {
                 exit={{ opacity: 0, x: -10 }}
                 transition={{ duration: 0.2 }}
               >
-                <h1 className="text-lg font-bold bg-gradient-to-r from-primary to-chart-4 bg-clip-text text-transparent">
-                  WorkshopFlow
+                <h1 className="text-lg font-bold bg-gradient-to-r from-primary to-chart-4 bg-clip-text text-transparent truncate">
+                  Sajan Shah
                 </h1>
-                <p className="text-[10px] text-muted-foreground -mt-0.5 tracking-wider uppercase">
-                  Pro Platform
+                <p className="text-[10px] text-muted-foreground -mt-0.5 tracking-wider uppercase truncate">
+                  Payment System
                 </p>
               </motion.div>
             )}
