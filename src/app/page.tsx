@@ -20,20 +20,8 @@ export default async function Home() {
       }
     }
 
-    // Check if setup is needed (no admin exists)
-    const { data: admins } = await supabase
-      .from('profiles')
-      .select('id')
-      .eq('role', 'admin')
-      .limit(1);
-
-    if (!admins || admins.length === 0) {
-      redirect('/setup');
-    }
-
     redirect('/login');
   } catch (error) {
-    // If tables don't exist yet, redirect to setup
-    redirect('/setup');
+    redirect('/login');
   }
 }

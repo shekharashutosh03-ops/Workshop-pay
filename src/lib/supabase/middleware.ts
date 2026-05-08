@@ -49,12 +49,11 @@ export async function updateSession(request: NextRequest) {
     request.nextUrl.pathname.startsWith('/forgot-password') ||
     request.nextUrl.pathname.startsWith('/reset-password');
 
-  const isSetupPage = request.nextUrl.pathname.startsWith('/setup');
   const isApiRoute = request.nextUrl.pathname.startsWith('/api');
   const isPublicPage = request.nextUrl.pathname === '/';
 
   // If no user and trying to access protected route
-  if (!user && !isAuthPage && !isPublicPage && !isSetupPage && !isApiRoute) {
+  if (!user && !isAuthPage && !isPublicPage && !isApiRoute) {
     const url = request.nextUrl.clone();
     url.pathname = '/login';
     return NextResponse.redirect(url);
@@ -83,7 +82,7 @@ export async function updateSession(request: NextRequest) {
       .single();
 
     const isEmployeeRoute = request.nextUrl.pathname.startsWith('/employee');
-    const isAdminRoute = !isEmployeeRoute && !isAuthPage && !isPublicPage && !isSetupPage && !isApiRoute;
+    const isAdminRoute = !isEmployeeRoute && !isAuthPage && !isPublicPage && !isApiRoute;
 
     // Employees cannot access admin routes
     if (profile?.role === 'employee' && isAdminRoute) {
